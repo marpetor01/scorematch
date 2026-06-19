@@ -2,10 +2,14 @@
 
 **See who'll likely approve you — sorted by pull type.**
 
-Type your credit score and get a ranked list of credit cards and lenders likely
-to approve you, each tagged **No pull · Soft pull · Hard pull** so an inquiry
-never catches you off guard. The whole idea is to take the *fear* out of
-applying.
+Type your credit score and pick your state, and get a ranked list of credit
+cards and lenders likely to approve you, each tagged **No pull · Soft pull ·
+Hard pull** so an inquiry never catches you off guard. The whole idea is to take
+the *fear* out of applying.
+
+Picking a state also surfaces **local** credit unions and community banks that
+only lend to residents there — tagged with a blue **Local** badge and floated to
+the top of your results.
 
 ## Why this angle
 

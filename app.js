@@ -7,8 +7,25 @@
   const resultsTitle = document.getElementById("resultsTitle");
   const cards = document.getElementById("cards");
   const filters = document.getElementById("filters");
+  const stateSelect = document.getElementById("state");
 
   let activePull = "all";
+
+  // Populate the state dropdown from the STATES list in lenders.js
+  STATES.forEach(([code, name]) => {
+    const opt = document.createElement("option");
+    opt.value = code;
+    opt.textContent = name;
+    stateSelect.appendChild(opt);
+  });
+
+  // Is this lender available to someone in `state`?
+  // No state selected -> only show nationwide options.
+  function availableIn(lender, state) {
+    if (lender.avail === "all") return true;
+    if (!state) return false;
+    return lender.avail.includes(state);
+  }
 
   function bandName(score) {
     if (score >= 800) return "Exceptional";
@@ -38,18 +55,27 @@
   }
 
   function render(score) {
+    const state = stateSelect.value;
     const matches = LENDERS
       .map((l) => ({ ...l, like: likelihood(score, l.min) }))
       .filter((l) => l.like !== null)
       .filter((l) => activePull === "all" || l.pull === activePull)
+      .filter((l) => availableIn(l, state))
       .sort((a, b) => {
+        // Local (state-specific) options surface above nationwide ones.
+        const aLocal = a.avail !== "all", bLocal = b.avail !== "all";
+        if (aLocal !== bLocal) return aLocal ? -1 : 1;
         const order = { none: 0, soft: 1, hard: 2 };
         if (order[a.pull] !== order[b.pull]) return order[a.pull] - order[b.pull];
         return b.min - a.min; // within a pull type, stronger options first
       });
 
+    const stateName = state ? STATES.find((s) => s[0] === state)[1] : null;
+    const where = stateName ? ` in ${stateName}` : "";
+
     results.hidden = false;
-    resultsTitle.textContent = `Score ${score} · ${bandName(score)} — ${matches.length} match${matches.length === 1 ? "" : "es"}`;
+    resultsTitle.textContent =
+      `Score ${score} · ${bandName(score)}${where} — ${matches.length} match${matches.length === 1 ? "" : "es"}`;
 
     if (matches.length === 0) {
       cards.innerHTML = `<p class="empty">No matches for this filter at this score. Try "All", or building with a no-pull option first.</p>`;
@@ -65,6 +91,7 @@
           <div class="cat">${l.cat}</div>
         </div>
         <div class="badges">
+          ${l.avail !== "all" ? `<span class="pill local">Local${stateName ? " · " + state : ""}</span>` : ""}
           <span class="pill ${l.pull}">${pullLabel(l.pull)}</span>
           <span class="likely ${l.like.key}">${l.like.label}</span>
         </div>
@@ -104,6 +131,10 @@
   });
   scoreInput.addEventListener("keydown", (e) => {
     if (e.key === "Enter") go();
+  });
+
+  stateSelect.addEventListener("change", () => {
+    if (!results.hidden) render(currentScore());
   });
 
   checkBtn.addEventListener("click", go);
