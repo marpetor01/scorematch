@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ScoreMatch — See who'll likely approve you, by pull type</title>
+  <meta name="description" content="Type your credit score and see which cards and lenders are likely to approve you — sorted by whether they do no pull, a soft pull, or a hard pull." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap">
+      <span class="logo">Score<span>Match</span></span>
+      <span class="tag">prequalify without the fear</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <h1>What can you actually get approved for?</h1>
+      <p class="sub">
+        Enter your credit score. We'll show cards and lenders likely to approve you —
+        and tell you up front whether each one does <strong>no pull</strong>,
+        a <strong>soft pull</strong>, or a <strong>hard pull</strong> so an
+        inquiry never surprises you.
+      </p>
+
+      <div class="scorebox" id="scorebox">
+        <label for="score">Your credit score</label>
+        <div class="inputrow">
+          <input
+            type="number"
+            id="score"
+            inputmode="numeric"
+            min="300"
+            max="850"
+            placeholder="e.g. 680"
+            autocomplete="off"
+          />
+          <button id="checkBtn">See my matches</button>
+        </div>
+        <input type="range" id="slider" min="300" max="850" value="680" step="1" />
+        <div class="bandrow" id="bandrow"></div>
+        <p class="hint">No login. Nothing leaves your browser. This is an estimate, not a guarantee.</p>
+      </div>
+    </section>
+
+    <section id="results" class="results" hidden>
+      <div class="results-head">
+        <h2 id="resultsTitle"></h2>
+        <div class="filters" id="filters">
+          <button class="chip active" data-pull="all">All</button>
+          <button class="chip" data-pull="none">No pull</button>
+          <button class="chip" data-pull="soft">Soft pull</button>
+          <button class="chip" data-pull="hard">Hard pull</button>
+        </div>
+      </div>
+      <div class="cards" id="cards"></div>
+    </section>
+
+    <section class="legend">
+      <h3>What the pull types mean</h3>
+      <ul>
+        <li><span class="dot none"></span><strong>No pull</strong> — they decide without touching your credit report. Zero score impact.</li>
+        <li><span class="dot soft"></span><strong>Soft pull</strong> — they peek at your report to prequalify. Visible only to you, no score impact.</li>
+        <li><span class="dot hard"></span><strong>Hard pull</strong> — a formal application. Can ding your score a few points and stays ~2 years.</li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap foot">
+    <p>
+      ScoreMatch is an educational demo. Likelihoods are estimates based on score
+      alone and don't account for income, debt, or recent inquiries. Not financial
+      advice. Not affiliated with the brands shown.
+    </p>
+  </footer>
+
+  <script src="lenders.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
