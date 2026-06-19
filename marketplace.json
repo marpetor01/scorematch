@@ -1,0 +1,259 @@
+{
+  "_meta": {
+    "name": "ScoreMatch Arizona Marketplace",
+    "version": "1.0.0",
+    "state": "AZ",
+    "disclaimer": "Institutions listed are real Arizona credit unions. Product details, minimum scores, and APR ranges are ILLUSTRATIVE ESTIMATES for an educational MVP and are NOT live offers or guarantees. Always confirm current terms directly with the institution.",
+    "lastUpdated": "2026-06-19"
+  },
+  "institutions": [
+    {
+      "id": "azfcu",
+      "institution": "Arizona Federal Credit Union",
+      "website": "https://www.arizonafederal.org/",
+      "states": ["AZ"],
+      "products": [
+        {
+          "id": "azfcu-secured",
+          "name": "Share Secured Visa",
+          "category": "credit_card",
+          "subtype": "secured",
+          "pull": "soft",
+          "minScore": 300,
+          "recommended": [300, 600],
+          "aprLow": 16.9,
+          "aprHigh": 24.9,
+          "goals": ["credit_card", "credit_builder"],
+          "description": "Deposit-backed Visa that reports to all three bureaus — a solid first card to build history."
+        },
+        {
+          "id": "azfcu-rewards",
+          "name": "Visa Rewards Card",
+          "category": "credit_card",
+          "subtype": "rewards",
+          "pull": "hard",
+          "minScore": 660,
+          "recommended": [660, 750],
+          "aprLow": 13.9,
+          "aprHigh": 21.9,
+          "goals": ["credit_card"],
+          "description": "Everyday rewards card for members with established good credit."
+        },
+        {
+          "id": "azfcu-auto",
+          "name": "New & Used Auto Loan",
+          "category": "loan",
+          "subtype": "auto",
+          "pull": "hard",
+          "minScore": 620,
+          "recommended": [640, 760],
+          "aprLow": 5.9,
+          "aprHigh": 14.9,
+          "goals": ["auto_loan"],
+          "description": "Member auto financing with rate discounts for autopay and strong credit."
+        }
+      ]
+    },
+    {
+      "id": "desert",
+      "institution": "Desert Financial Credit Union",
+      "website": "https://www.desertfinancial.com/",
+      "states": ["AZ"],
+      "products": [
+        {
+          "id": "desert-builder",
+          "name": "Credit Builder Loan",
+          "category": "credit_builder",
+          "subtype": "builder",
+          "pull": "soft",
+          "minScore": 300,
+          "recommended": [300, 580],
+          "aprLow": 8.0,
+          "aprHigh": 14.0,
+          "goals": ["credit_builder"],
+          "description": "Small installment loan held in savings while you pay it off — designed purely to build score."
+        },
+        {
+          "id": "desert-cashback",
+          "name": "Cash Back Visa",
+          "category": "credit_card",
+          "subtype": "cash_back",
+          "pull": "hard",
+          "minScore": 670,
+          "recommended": [670, 760],
+          "aprLow": 14.4,
+          "aprHigh": 23.4,
+          "goals": ["credit_card"],
+          "description": "Flat cash-back rewards for members with good-to-excellent credit."
+        },
+        {
+          "id": "desert-personal",
+          "name": "Personal Loan",
+          "category": "loan",
+          "subtype": "personal",
+          "pull": "soft",
+          "minScore": 640,
+          "recommended": [660, 780],
+          "aprLow": 9.9,
+          "aprHigh": 18.9,
+          "goals": ["personal_loan"],
+          "description": "Fixed-rate personal loan with a soft-pull prequalification before you commit."
+        },
+        {
+          "id": "desert-mortgage",
+          "name": "Fixed-Rate Mortgage",
+          "category": "loan",
+          "subtype": "mortgage",
+          "pull": "hard",
+          "minScore": 620,
+          "recommended": [680, 800],
+          "aprLow": 6.1,
+          "aprHigh": 7.9,
+          "goals": ["mortgage"],
+          "description": "Conventional fixed-rate home loan for qualifying Arizona members."
+        }
+      ]
+    },
+    {
+      "id": "oneaz",
+      "institution": "OneAZ Credit Union",
+      "website": "https://www.oneazcu.com/",
+      "states": ["AZ"],
+      "products": [
+        {
+          "id": "oneaz-secured",
+          "name": "Secured Credit Card",
+          "category": "credit_card",
+          "subtype": "secured",
+          "pull": "soft",
+          "minScore": 300,
+          "recommended": [300, 620],
+          "aprLow": 17.4,
+          "aprHigh": 25.4,
+          "goals": ["credit_card", "credit_builder"],
+          "description": "Secured card that converts toward an unsecured line as you build a track record."
+        },
+        {
+          "id": "oneaz-personal",
+          "name": "Signature Personal Loan",
+          "category": "loan",
+          "subtype": "personal",
+          "pull": "soft",
+          "minScore": 650,
+          "recommended": [670, 780],
+          "aprLow": 10.9,
+          "aprHigh": 19.9,
+          "goals": ["personal_loan"],
+          "description": "Unsecured personal loan with soft-pull rate estimates for members."
+        },
+        {
+          "id": "oneaz-auto",
+          "name": "Auto Loan",
+          "category": "loan",
+          "subtype": "auto",
+          "pull": "hard",
+          "minScore": 630,
+          "recommended": [650, 770],
+          "aprLow": 6.4,
+          "aprHigh": 15.4,
+          "goals": ["auto_loan"],
+          "description": "Competitive auto financing for new and used vehicles across Arizona."
+        }
+      ]
+    },
+    {
+      "id": "vantagewest",
+      "institution": "Vantage West Credit Union",
+      "website": "https://www.vantagewest.org/",
+      "states": ["AZ"],
+      "products": [
+        {
+          "id": "vw-builder",
+          "name": "Fresh Start Credit Builder",
+          "category": "credit_builder",
+          "subtype": "builder",
+          "pull": "soft",
+          "minScore": 300,
+          "recommended": [300, 600],
+          "aprLow": 7.5,
+          "aprHigh": 13.5,
+          "goals": ["credit_builder"],
+          "description": "Builder loan aimed at thin-file and rebuilding members; reports to all bureaus."
+        },
+        {
+          "id": "vw-rewards",
+          "name": "Connect Rewards Visa",
+          "category": "credit_card",
+          "subtype": "rewards",
+          "pull": "hard",
+          "minScore": 680,
+          "recommended": [680, 770],
+          "aprLow": 13.9,
+          "aprHigh": 22.9,
+          "goals": ["credit_card"],
+          "description": "Rewards Visa for members with good credit in southern and central Arizona."
+        },
+        {
+          "id": "vw-auto",
+          "name": "Auto Loan",
+          "category": "loan",
+          "subtype": "auto",
+          "pull": "hard",
+          "minScore": 620,
+          "recommended": [640, 760],
+          "aprLow": 6.2,
+          "aprHigh": 15.9,
+          "goals": ["auto_loan"],
+          "description": "Vehicle financing with flexible terms for Arizona members."
+        }
+      ]
+    },
+    {
+      "id": "truwest",
+      "institution": "TruWest Credit Union",
+      "website": "https://www.truwest.org/",
+      "states": ["AZ"],
+      "products": [
+        {
+          "id": "truwest-secured",
+          "name": "Secured Visa Platinum",
+          "category": "credit_card",
+          "subtype": "secured",
+          "pull": "soft",
+          "minScore": 300,
+          "recommended": [300, 620],
+          "aprLow": 16.4,
+          "aprHigh": 23.4,
+          "goals": ["credit_card", "credit_builder"],
+          "description": "Low-rate secured Visa to establish or rebuild credit with full bureau reporting."
+        },
+        {
+          "id": "truwest-platinum",
+          "name": "Visa Platinum",
+          "category": "credit_card",
+          "subtype": "low_apr",
+          "pull": "hard",
+          "minScore": 690,
+          "recommended": [700, 800],
+          "aprLow": 11.9,
+          "aprHigh": 19.9,
+          "goals": ["credit_card"],
+          "description": "Low-APR Visa Platinum for members with very good to excellent credit."
+        },
+        {
+          "id": "truwest-mortgage",
+          "name": "Home Mortgage",
+          "category": "loan",
+          "subtype": "mortgage",
+          "pull": "hard",
+          "minScore": 640,
+          "recommended": [700, 800],
+          "aprLow": 6.0,
+          "aprHigh": 7.7,
+          "goals": ["mortgage"],
+          "description": "Home financing options for qualifying members in Arizona and Texas."
+        }
+      ]
+    }
+  ]
+}

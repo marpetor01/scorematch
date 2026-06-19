@@ -1,152 +1,189 @@
 (function () {
-  const scoreInput = document.getElementById("score");
-  const slider = document.getElementById("slider");
-  const bandrow = document.getElementById("bandrow");
-  const checkBtn = document.getElementById("checkBtn");
-  const results = document.getElementById("results");
-  const resultsTitle = document.getElementById("resultsTitle");
-  const cards = document.getElementById("cards");
-  const filters = document.getElementById("filters");
-  const stateSelect = document.getElementById("state");
+  const $ = (id) => document.getElementById(id);
+  const slider = $("slider");
+  const scoreVal = $("scoreVal");
+  const ratePill = $("ratePill");
+  const goalSel = $("goal");
+  const analyzeBtn = $("analyzeBtn");
 
-  let activePull = "all";
+  const advisor = $("advisor");
+  const simNote = $("simNote");
+  const marketplace = $("marketplace");
 
-  // Populate the state dropdown from the STATES list in lenders.js
-  STATES.forEach(([code, name]) => {
-    const opt = document.createElement("option");
-    opt.value = code;
-    opt.textContent = name;
-    stateSelect.appendChild(opt);
-  });
+  let PRODUCTS = [];      // flattened {institution, website, ...product}
+  let started = false;    // has the user analyzed once?
+  let activeFilter = "all";
 
-  // Is this lender available to someone in `state`?
-  // No state selected -> only show nationwide options.
-  function availableIn(lender, state) {
-    if (lender.avail === "all") return true;
-    if (!state) return false;
-    return lender.avail.includes(state);
-  }
-
-  function bandName(score) {
-    if (score >= 800) return "Exceptional";
-    if (score >= 740) return "Very good";
-    if (score >= 670) return "Good";
-    if (score >= 580) return "Fair";
-    return "Poor / building";
-  }
-
-  // How likely approval is, given how far the score clears the lender's floor.
-  function likelihood(score, min) {
-    const gap = score - min;
-    if (gap < 0) return null;            // below floor — exclude
-    if (gap >= 40) return { key: "high", label: "Likely" };
-    if (gap >= 15) return { key: "mid", label: "Possible" };
-    return { key: "low", label: "Borderline" };
-  }
-
-  function pullLabel(pull) {
-    return pull === "none" ? "No pull" : pull === "soft" ? "Soft pull" : "Hard pull";
-  }
-
-  function clampScore(v) {
-    v = parseInt(v, 10);
-    if (isNaN(v)) return null;
-    return Math.min(850, Math.max(300, v));
-  }
-
-  function render(score) {
-    const state = stateSelect.value;
-    const matches = LENDERS
-      .map((l) => ({ ...l, like: likelihood(score, l.min) }))
-      .filter((l) => l.like !== null)
-      .filter((l) => activePull === "all" || l.pull === activePull)
-      .filter((l) => availableIn(l, state))
-      .sort((a, b) => {
-        // Local (state-specific) options surface above nationwide ones.
-        const aLocal = a.avail !== "all", bLocal = b.avail !== "all";
-        if (aLocal !== bLocal) return aLocal ? -1 : 1;
-        const order = { none: 0, soft: 1, hard: 2 };
-        if (order[a.pull] !== order[b.pull]) return order[a.pull] - order[b.pull];
-        return b.min - a.min; // within a pull type, stronger options first
+  // Flatten marketplace.json into one product list.
+  function flatten(data) {
+    const out = [];
+    data.institutions.forEach((inst) => {
+      inst.products.forEach((p) => {
+        out.push({ institution: inst.institution, website: inst.website, ...p });
       });
+    });
+    return out;
+  }
 
-    const stateName = state ? STATES.find((s) => s[0] === state)[1] : null;
-    const where = stateName ? ` in ${stateName}` : "";
+  function score() { return parseInt(slider.value, 10); }
 
-    results.hidden = false;
-    resultsTitle.textContent =
-      `Score ${score} · ${bandName(score)}${where} — ${matches.length} match${matches.length === 1 ? "" : "es"}`;
+  function updateHead() {
+    const s = score();
+    scoreVal.textContent = s;
+    const r = Advisor.rating(s);
+    ratePill.textContent = r.label;
+  }
 
-    if (matches.length === 0) {
-      cards.innerHTML = `<p class="empty">No matches for this filter at this score. Try "All", or building with a no-pull option first.</p>`;
-      return;
+  function aprText(p) {
+    return `${p.aprLow.toFixed(1)}–${p.aprHigh.toFixed(1)}%`;
+  }
+  function pullLabel(pull) {
+    return pull === "none" ? "No Pull" : pull === "soft" ? "Soft Pull" : "Hard Pull";
+  }
+
+  // Filter predicate for the marketplace chips.
+  function passesFilter(p) {
+    switch (activeFilter) {
+      case "all": return true;
+      case "none": return p.pull === "none";
+      case "soft": return p.pull === "soft";
+      case "hard": return p.pull === "hard";
+      case "credit_card": return p.category === "credit_card";
+      case "loan": return p.category === "loan";
+      case "credit_builder": return p.category === "credit_builder";
+      default: return true;
     }
+  }
 
-    cards.innerHTML = matches
-      .map(
-        (l) => `
-      <div class="card">
+  function reasonFor(p, s, goal) {
+    if (p.goals.includes(goal)) return `Matches your goal and your score of ${s} clears its typical ${p.minScore}+ range.`;
+    if (p.pull !== "hard") return `Soft-pull option you can check with zero score impact.`;
+    return `In reach for your score; compare its APR before a hard inquiry.`;
+  }
+  function eligibilityFor(p, s) {
+    const gap = s - p.minScore;
+    if (gap >= 40) return `Comfortably above its ~${p.minScore} typical minimum.`;
+    if (gap >= 0) return `Just within range of its ~${p.minScore} typical minimum.`;
+    return `Typically needs ~${p.minScore}; you're ${Math.abs(gap)} below — possible with strong income/history.`;
+  }
+
+  function cardHTML(p, s, goal, dim) {
+    return `
+    <article class="card ${dim ? "dim" : ""}">
+      <div class="card-top">
         <div>
-          <div class="bank">${l.bank}</div>
-          <h4>${l.account}</h4>
-          <div class="cat">${l.cat}</div>
+          <div class="inst">${p.institution}</div>
+          <h4>${p.name}</h4>
+          <div class="cat">${p.subtype.replace(/_/g, " ")} · ${p.category.replace(/_/g, " ")}</div>
         </div>
         <div class="badges">
-          ${l.avail !== "all" ? `<span class="pill local">Local${stateName ? " · " + state : ""}</span>` : ""}
-          <span class="pill ${l.pull}">${pullLabel(l.pull)}</span>
-          <span class="likely ${l.like.key}">${l.like.label}</span>
+          <span class="likebadge ${p.tier.key}">${p.tier.label} · ${p.confidence}%</span>
+          <span class="pill ${p.pull}">${pullLabel(p.pull)}</span>
         </div>
-        <div class="desc">${l.desc}</div>
-      </div>`
-      )
+      </div>
+      <div class="card-meta">
+        <div class="metaitem"><div class="k">Est. APR</div><div class="v">${aprText(p)}</div></div>
+        <div class="metaitem"><div class="k">Min score</div><div class="v">${p.minScore}</div></div>
+        <div class="metaitem"><div class="k">Inquiry</div><div class="v">${pullLabel(p.pull)}</div></div>
+      </div>
+      <div class="reason">💡 ${reasonFor(p, s, goal)}</div>
+      <p class="eligibility">${eligibilityFor(p, s)}</p>
+      <a class="visit" href="${p.website}" target="_blank" rel="noopener noreferrer">Visit lender →</a>
+    </article>`;
+  }
+
+  function renderAdvisor(a) {
+    $("advisorRating").textContent = `${a.rating.label} credit · ${a.goalLabel}`;
+    $("advisorSummary").textContent =
+      `Based on a score of ${a.score} in Arizona, here's where you stand and what to do next.`;
+
+    // Animate the confidence ring + number.
+    const ring = $("confRing");
+    ring.style.setProperty("--pct", a.headlineConfidence);
+    animateNum($("confVal"), a.headlineConfidence);
+
+    $("nextSteps").innerHTML = a.nextSteps.map((s) => `<li>${s}</li>`).join("");
+    $("improvements").innerHTML = a.improvements
+      .map((r) => `<li><span class="tip">${r.tip}</span><div class="impact">${r.impact}</div></li>`)
       .join("");
   }
 
-  function currentScore() {
-    return clampScore(scoreInput.value) ?? parseInt(slider.value, 10);
+  function renderMarketplace(a, s, goal) {
+    const likely = a.likely.filter(passesFilter);
+    const unlikely = a.unlikely.filter(passesFilter);
+
+    $("likelyCards").innerHTML = likely.length
+      ? likely.map((p) => cardHTML(p, s, goal, false)).join("")
+      : `<p class="empty">No likely matches for this filter at score ${s}. Try "All".</p>`;
+
+    const unlikelyLabel = $("unlikelyLabel");
+    if (unlikely.length) {
+      unlikelyLabel.hidden = false;
+      $("unlikelyCards").innerHTML = unlikely.map((p) => cardHTML(p, s, goal, true)).join("");
+    } else {
+      unlikelyLabel.hidden = true;
+      $("unlikelyCards").innerHTML = "";
+    }
   }
 
-  function updateBand() {
-    const s = currentScore();
-    bandrow.innerHTML =
-      `<span>300</span><span class="cur">${s} · ${bandName(s)}</span><span>850</span>`;
+  function run(scrollTo) {
+    const s = score();
+    const goal = goalSel.value;
+    const analysis = Advisor.analyze(s, goal, PRODUCTS);
+    renderAdvisor(analysis);
+    renderMarketplace(analysis, s, goal);
+
+    [advisor, simNote, marketplace].forEach((el) => {
+      el.hidden = false;
+      el.classList.remove("reveal");
+      // reflow to restart animation
+      void el.offsetWidth;
+      el.classList.add("reveal");
+    });
+    started = true;
+
+    if (scrollTo) advisor.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
-  function go() {
-    const s = currentScore();
-    updateBand();
-    render(s);
-    results.scrollIntoView({ behavior: "smooth", block: "start" });
+  function animateNum(el, target) {
+    const start = parseInt(el.textContent, 10) || 0;
+    const dur = 700, t0 = performance.now();
+    function step(now) {
+      const k = Math.min(1, (now - t0) / dur);
+      const eased = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(start + (target - start) * eased);
+      if (k < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
   }
 
-  // Sync slider <-> number input
+  // ---- events ----
   slider.addEventListener("input", () => {
-    scoreInput.value = slider.value;
-    updateBand();
-    if (!results.hidden) render(currentScore());
+    updateHead();
+    if (started) run(false); // live simulator
   });
-  scoreInput.addEventListener("input", () => {
-    const s = clampScore(scoreInput.value);
-    if (s !== null) slider.value = s;
-    updateBand();
-  });
-  scoreInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") go();
-  });
+  goalSel.addEventListener("change", () => { if (started) run(false); });
+  analyzeBtn.addEventListener("click", () => run(true));
 
-  stateSelect.addEventListener("change", () => {
-    if (!results.hidden) render(currentScore());
-  });
-
-  checkBtn.addEventListener("click", go);
-
-  filters.addEventListener("click", (e) => {
+  $("filters").addEventListener("click", (e) => {
     const chip = e.target.closest(".chip");
     if (!chip) return;
-    activePull = chip.dataset.pull;
-    [...filters.children].forEach((c) => c.classList.toggle("active", c === chip));
-    if (!results.hidden) render(currentScore());
+    activeFilter = chip.dataset.filter;
+    [...e.currentTarget.children].forEach((c) => c.classList.toggle("active", c === chip));
+    if (started) run(false);
   });
 
-  updateBand();
+  // ---- boot ----
+  updateHead();
+  fetch("marketplace.json")
+    .then((r) => r.json())
+    .then((data) => {
+      PRODUCTS = flatten(data);
+      // #autorun renders results immediately (handy for demos/previews).
+      if (location.hash === "#autorun") run(false);
+    })
+    .catch(() => {
+      analyzeBtn.disabled = true;
+      analyzeBtn.textContent = "Couldn't load marketplace data";
+    });
 })();

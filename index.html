@@ -3,86 +3,141 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ScoreMatch — See who'll likely approve you, by pull type</title>
-  <meta name="description" content="Type your credit score and see which cards and lenders are likely to approve you — sorted by whether they do no pull, a soft pull, or a hard pull." />
+  <title>ScoreMatch — Know where you stand before you apply</title>
+  <meta name="description" content="AI-powered financial discovery for Arizona. See what you may qualify for — and which lenders do soft vs. hard pulls — before you apply." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+  <div class="aurora" aria-hidden="true"></div>
+
   <header class="topbar">
-    <div class="wrap">
+    <div class="wrap inner">
       <span class="logo">Score<span>Match</span></span>
-      <span class="tag">prequalify without the fear</span>
+      <span class="az-chip">🌵 Arizona</span>
+      <span class="promise">Know where you stand before you apply.</span>
     </div>
   </header>
 
   <main class="wrap">
+    <!-- ONBOARDING -->
     <section class="hero">
-      <h1>What can you actually get approved for?</h1>
+      <h1>What can you <span class="grad">actually</span> qualify for?</h1>
       <p class="sub">
-        Enter your credit score. We'll show cards and lenders likely to approve you —
-        and tell you up front whether each one does <strong>no pull</strong>,
-        a <strong>soft pull</strong>, or a <strong>hard pull</strong> so an
-        inquiry never surprises you.
+        AI-guided financial discovery for Arizona. Get your credit rating, real
+        approval odds, and matched products — and see who does a
+        <strong>soft pull</strong> vs. a <strong>hard pull</strong> before an
+        inquiry ever touches your report.
       </p>
 
-      <div class="scorebox" id="scorebox">
-        <label for="score">Your credit score</label>
-        <div class="inputrow">
-          <input
-            type="number"
-            id="score"
-            inputmode="numeric"
-            min="300"
-            max="850"
-            placeholder="e.g. 680"
-            autocomplete="off"
-          />
-          <button id="checkBtn">See my matches</button>
+      <div class="glass onboard">
+        <div class="field">
+          <label for="score">Credit score</label>
+          <div class="scorehead"><span id="scoreVal">680</span><span class="ratepill" id="ratePill">Good</span></div>
+          <input type="range" id="slider" min="300" max="850" value="680" step="1" />
+          <div class="bandrow"><span>300</span><span>850</span></div>
         </div>
-        <input type="range" id="slider" min="300" max="850" value="680" step="1" />
 
-        <label for="state" class="statelabel">Search by state</label>
-        <select id="state">
-          <option value="">All states (nationwide options only)</option>
-        </select>
-        <p class="hint">Pick or type a state to find local banks and credit unions near you.</p>
-        <div class="bandrow" id="bandrow"></div>
-        <p class="hint">No login. Nothing leaves your browser. This is an estimate, not a guarantee.</p>
+        <div class="grid2">
+          <div class="field">
+            <label for="state">State</label>
+            <select id="state">
+              <option value="AZ" selected>🌵 Arizona</option>
+            </select>
+            <p class="microhint">Arizona-only for this MVP.</p>
+          </div>
+          <div class="field">
+            <label for="goal">Your goal</label>
+            <select id="goal">
+              <option value="credit_card">Credit Card</option>
+              <option value="auto_loan">Auto Loan</option>
+              <option value="personal_loan">Personal Loan</option>
+              <option value="credit_builder">Credit Builder</option>
+              <option value="mortgage">Mortgage</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="analyzeBtn" class="cta-primary">
+          <span class="spark">✦</span> Analyze my options
+        </button>
+        <p class="microhint center">No login. Nothing leaves your browser.</p>
       </div>
     </section>
 
-    <section id="results" class="results" hidden>
-      <div class="results-head">
-        <h2 id="resultsTitle"></h2>
+    <!-- AI ADVISOR -->
+    <section id="advisor" class="advisor" hidden>
+      <div class="glass advisor-head">
+        <div class="advisor-meta">
+          <span class="kicker">✦ AI Credit Advisor</span>
+          <h2 id="advisorRating"></h2>
+          <p id="advisorSummary" class="muted"></p>
+        </div>
+        <div class="conf-ring" id="confRing">
+          <div class="conf-num"><span id="confVal">0</span><small>%</small></div>
+          <div class="conf-cap">approval confidence</div>
+        </div>
+      </div>
+
+      <div class="advisor-cols">
+        <div class="glass panel">
+          <h3>Your next steps</h3>
+          <ul id="nextSteps" class="steps"></ul>
+        </div>
+        <div class="glass panel">
+          <h3>Improve your score</h3>
+          <ul id="improvements" class="improve"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SIMULATOR NOTE -->
+    <section id="simNote" class="simnote" hidden>
+      <div class="glass simbar">
+        <span class="spark">✦</span>
+        <span>Move the score slider above — every match, badge, and APR updates live.</span>
+      </div>
+    </section>
+
+    <!-- MARKETPLACE -->
+    <section id="marketplace" class="marketplace" hidden>
+      <div class="market-head">
+        <h2>Arizona marketplace</h2>
         <div class="filters" id="filters">
-          <button class="chip active" data-pull="all">All</button>
-          <button class="chip" data-pull="none">No pull</button>
-          <button class="chip" data-pull="soft">Soft pull</button>
-          <button class="chip" data-pull="hard">Hard pull</button>
+          <button class="chip active" data-filter="all">All</button>
+          <button class="chip" data-filter="none">No Pull</button>
+          <button class="chip" data-filter="soft">Soft Pull</button>
+          <button class="chip" data-filter="hard">Hard Pull</button>
+          <button class="chip" data-filter="credit_card">Credit Cards</button>
+          <button class="chip" data-filter="loan">Loans</button>
+          <button class="chip" data-filter="credit_builder">Credit Building</button>
         </div>
       </div>
-      <div class="cards" id="cards"></div>
+
+      <div class="section-label likely-label">Likely available</div>
+      <div class="cards" id="likelyCards"></div>
+
+      <div class="section-label unlikely-label" id="unlikelyLabel">Unlikely — for now</div>
+      <div class="cards" id="unlikelyCards"></div>
     </section>
 
-    <section class="legend">
-      <h3>What the pull types mean</h3>
-      <ul>
-        <li><span class="dot none"></span><strong>No pull</strong> — they decide without touching your credit report. Zero score impact.</li>
-        <li><span class="dot soft"></span><strong>Soft pull</strong> — they peek at your report to prequalify. Visible only to you, no score impact.</li>
-        <li><span class="dot hard"></span><strong>Hard pull</strong> — a formal application. Can ding your score a few points and stays ~2 years.</li>
-      </ul>
+    <!-- DISCLAIMER -->
+    <section class="glass disclaimer" id="disclaimer">
+      <strong>Disclaimer.</strong> ScoreMatch provides educational estimates only
+      and is not a lender, credit bureau, or financial advisor. Approval decisions
+      are determined solely by financial institutions. Product details and APRs
+      shown are illustrative estimates — confirm current terms with each
+      institution before applying.
     </section>
   </main>
 
   <footer class="wrap foot">
-    <p>
-      ScoreMatch is an educational demo. Likelihoods are estimates based on score
-      alone and don't account for income, debt, or recent inquiries. Not financial
-      advice. Not affiliated with the brands shown.
-    </p>
+    <p>ScoreMatch · Arizona MVP · Educational tool, not affiliated with the institutions shown.</p>
   </footer>
 
-  <script src="lenders.js"></script>
+  <script src="advisor.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

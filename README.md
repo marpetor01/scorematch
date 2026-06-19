@@ -1,57 +1,80 @@
-# ScoreMatch
+# ScoreMatch — Arizona MVP
 
-**See who'll likely approve you — sorted by pull type.**
+**Know where you stand before you apply.**
 
-Type your credit score and pick your state, and get a ranked list of credit
-cards and lenders likely to approve you, each tagged **No pull · Soft pull ·
-Hard pull** so an inquiry never catches you off guard. The whole idea is to take
-the *fear* out of applying.
+ScoreMatch is an AI-guided financial discovery platform. Tell it your credit
+score and goal, and it returns your credit rating, an approval-confidence
+estimate, matched Arizona products, and a personalized plan — while showing
+which lenders do a **soft pull** vs. a **hard pull** so you avoid needless hard
+inquiries.
 
-Picking a state also surfaces **local** credit unions and community banks that
-only lend to residents there — tagged with a blue **Local** badge and floated to
-the top of your results.
+> **Arizona-only MVP.** The marketplace covers real Arizona credit unions.
 
-## Why this angle
+## Features
 
-Existing tools (Credit Karma, NerdWallet, Experian) show offers, but none of
-them lead with the thing people are actually afraid of: **the hard inquiry.**
-ScoreMatch organizes everything around pull type first.
+1. **Onboarding** — score slider (300–850), state (Arizona), and goal (Credit
+   Card / Auto Loan / Personal Loan / Credit Builder / Mortgage).
+2. **AI Credit Advisor** — credit rating, approval-confidence %, likely vs.
+   unlikely products, next steps, and score-improvement tips. Rules-based and
+   fully in-browser (see *Architecture*).
+3. **Arizona Marketplace** — structured `marketplace.json` of real institutions
+   and their products.
+4. **Match Cards** — approval badge, inquiry-type badge, estimated APR,
+   recommended reason, eligibility explanation, and a **Visit lender** CTA.
+5. **Filters** — All · No Pull · Soft Pull · Hard Pull · Credit Cards · Loans ·
+   Credit Building.
+6. **Score Simulator** — drag the slider and every match, badge, %, and APR
+   updates instantly.
+7. **Disclaimer** — clearly states ScoreMatch is not a lender, bureau, or
+   advisor.
 
 ## Run it
 
-It's a static site — no build step.
+Static site — no build. Must be served over HTTP (the marketplace loads via
+`fetch`):
 
 ```bash
-# from this folder
 python3 -m http.server 8000
-# then open http://localhost:8000
+# open http://localhost:8000
 ```
 
-Or just open `index.html` in a browser.
+Append `#autorun` to render results immediately (handy for demos/screenshots).
 
-## Files
+## Architecture
 
-- `index.html` — page + score input
-- `styles.css` — styling
-- `lenders.js` — **demo** lender dataset (illustrative, not live offers)
-- `app.js` — matching + ranking logic
+| File | Role |
+|------|------|
+| `index.html` | Onboarding, advisor, marketplace, simulator, disclaimer |
+| `styles.css` | Dark glassmorphism UI (Apple Card / Rocket Money inspired) |
+| `advisor.js` | `Advisor.analyze()` — deterministic credit engine |
+| `marketplace.json` | Arizona institutions + products (the data layer) |
+| `app.js` | Loads data, runs the advisor, renders, handles simulator/filters |
 
-## Honest limitations (read this)
+### Why the advisor is rules-based (not an LLM call)
 
-- A **score alone cannot guarantee approval.** Real decisions use income,
-  debt-to-income, recent inquiries, and derogatory marks. ScoreMatch only
-  estimates *likelihood*, never approval.
-- The lender list is **illustrative demo data** with typical thresholds — it is
-  not scraped from issuers and is not financial advice.
+A static site can't safely hold an API key, and users' credit scores shouldn't
+be shipped to a third party. The advisor is **deterministic, explainable, and
+runs 100% in the browser** — nothing leaves the device. `Advisor.analyze()` is
+isolated so a real LLM or underwriting backend can replace it later without
+touching the UI.
 
-## Where this goes next
+## Honest limitations
 
-1. Replace demo data with a maintained dataset of real prequalify offers.
-2. Add optional questions (income, recent inquiries) to sharpen likelihood.
-3. Affiliate/referral revenue — but rank by *fit*, not payout.
-4. Review FCRA / CFPB obligations before showing real offers and earning
-   referral fees.
+- Institutions are **real Arizona credit unions**, but product names, minimum
+  scores, and APR ranges are **illustrative estimates** for an MVP — not live
+  offers. Confirm current terms with each institution.
+- A score alone can't guarantee approval; real decisions use income,
+  debt-to-income, recent inquiries, and history. ScoreMatch estimates
+  *likelihood*, never approval.
+
+## Roadmap
+
+1. Replace estimated product data with a maintained, dated feed of real offers.
+2. Add income / DTI / inquiry inputs to sharpen confidence.
+3. Real prequalification API integrations (soft-pull).
+4. Expand beyond Arizona.
+5. Optional LLM advisor backend behind `Advisor.analyze()`.
 
 ---
 
-*Educational prototype. Not affiliated with any brand shown. Not financial advice.*
+*Educational tool. Not affiliated with any institution shown. Not financial advice.*
