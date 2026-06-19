@@ -87,7 +87,8 @@
         (l) => `
       <div class="card">
         <div>
-          <h4>${l.name}</h4>
+          <div class="bank">${l.bank}</div>
+          <h4>${l.account}</h4>
           <div class="cat">${l.cat}</div>
         </div>
         <div class="badges">

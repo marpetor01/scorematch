@@ -113,7 +113,8 @@ body {
   gap: 6px 16px;
   align-items: start;
 }
-.card h4 { margin: 0; font-size: 17px; }
+.card .bank { color: var(--accent); font-size: 13px; font-weight: 700; letter-spacing: 0.2px; }
+.card h4 { margin: 2px 0 0; font-size: 17px; }
 .card .cat { color: var(--muted); font-size: 13px; }
 .card .desc { color: var(--muted); font-size: 14px; grid-column: 1 / -1; margin-top: 4px; }
 .badges { display: flex; flex-direction: column; gap: 6px; align-items: flex-end; }
